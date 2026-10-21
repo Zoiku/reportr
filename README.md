@@ -1,16 +1,62 @@
-# React + Vite
+# Reportr
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A reporting application with Google sign-in, a report feed, report detail/status pages, attachment uploads, and report interactions such as support, reup, flag, and track.
 
-Currently, two official plugins are available:
+Built with React 19, Vite, Firebase Authentication/Firestore, Cloudinary uploads, TanStack Query, Zustand, Tailwind CSS, and Radix UI.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Local development
 
-## React Compiler
+```sh
+git clone https://github.com/Zoiku/reportr.git
+cd reportr
+npm install
+```
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+Create `.env.local` with your Firebase browser configuration:
 
-## Expanding the ESLint configuration
+```dotenv
+VITE_FIREBASE_CONFIG_API_KEY=
+VITE_FIREBASE_CONFIG_AUTH_DOMAIN=
+VITE_FIREBASE_CONFIG_PROJECT_ID=
+VITE_FIREBASE_CONFIG_STORAGE_BUCKET=
+VITE_FIREBASE_CONFIG_MESSAGING_SENDER_ID=
+VITE_FIREBASE_CONFIG_APP_ID=
+VITE_FIREBASE_CONFIG_MEASUREMENT_ID=
+VITE_CLOUDINARY_CLOUD_NAME=
+VITE_CLOUDINARY_CLOUD_PRESET_NAME=
+VITE_REPORT_INPUT_MIN_LENGTH=10
+VITE_REPORT_INPUT_MAX_LENGTH=2000
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+The input limits above are example project settings; choose the limits appropriate to your deployment. Firebase values are read in `src/configs/firebase.js`. Enable Google sign-in, authorize the local domain, and configure Firestore rules for your intended access model.
+
+Attachments use `src/services/upload.js` and require a Cloudinary upload preset suitable for browser uploads. The frontend has no private Cloudinary signing endpoint; do not put a private API secret in Vite variables.
+
+```sh
+npm run dev
+```
+
+Open Vite's printed URL. Node.js and npm are required.
+
+## Commands
+
+- `npm run build`: production assets in `dist/`.
+- `npm run preview`: serves the production build locally.
+- `npm run lint`: ESLint.
+
+No test script is declared.
+
+## Code guide
+
+- `src/routes/`: sign-in, protected pages, and system routes.
+- `src/forms/quick-create-report.jsx`: report creation and input limits.
+- `src/services/report.js`: Firestore `reports` queries and creation.
+- `src/services/interactions.js`: interaction collections.
+- `src/services/upload.js`: Cloudinary attachment uploads.
+- `src/hooks/use-auth-store.js`: Google sign-in/session state.
+
+The `flagReport` export in `report.js` is a stub; interaction functions are implemented separately in `interactions.js`. Do not assume every interface action has a completed backend workflow.
+
+## Deployment and checks
+
+Set public configuration before building and host `dist/` with fallback to `index.html` for protected browser routes. Verify sign-in, report creation, attachment handling, detail navigation, and access rules using a development Firebase project.
